@@ -1,5 +1,5 @@
 import numpy as np
-from listoperations import is_listoflists
+from .listoperations import is_listoflists
 
 def unit_vector(vector : np.ndarray) -> np.ndarray:
     """ 
