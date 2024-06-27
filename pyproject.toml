@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "pjmstools"
+version = "0.1.0"
+description = ""
+authors = ["WetenSchaap <36634689+WetenSchaap@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+numpy = "^2.0.0"
+pandas = "^2.2.2"
+matplotlib = "^3.9.0"
+scipy = "^1.14.0"
+pillow = "^10.3.0"
+scikit-image = "^0.24.0"
+pims = "^0.7"
+opencv-python = "^4.10.0.84"
+ruamel-yaml = "^0.18.6"
+tifffile = "^2024.6.18"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
