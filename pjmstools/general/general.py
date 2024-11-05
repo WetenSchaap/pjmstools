@@ -1,6 +1,6 @@
 import numpy as np
 
-def closest_entry(target: float, my_dict: dict) -> tuple[float,any]:
+def closest_key_in_a_dict(target: float, my_dict: dict) -> tuple[float,any]:
     """
     Find the key in a dict closest in numerical value to the target
 
@@ -86,4 +86,4 @@ if __name__ == "__main__":
         8: 8,
         9: 9,
     }
-    print( closest_entry(4.231,dict) )
+    print( closest_key_in_a_dict(4.231,dict) )
