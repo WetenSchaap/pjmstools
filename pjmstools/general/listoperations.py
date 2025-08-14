@@ -44,6 +44,13 @@ def is_listoflists(l : list[list]|list[tuple]|tuple[tuple,...]|tuple[list,...]) 
     else:
         return False
 
+def closest_in_list(l : list, item) -> int:
+    """
+    Returns the index of the closest item in a list to the given item.
+    If there are multiple items equally close, returns the first one.
+    """
+    return min(range(len(l)), key=lambda i: abs(l[i] - item))
+
 def _merge_identical_listoflist(l : list, upwards=False) -> list:
     """Helper for nested_to_listoflist, probably not usefull alone"""
     l.sort()
