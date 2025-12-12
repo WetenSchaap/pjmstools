@@ -8,7 +8,7 @@ def unit_vector(vector : np.ndarray) -> np.ndarray:
     try:
         norm = np.linalg.norm(vector.astype(float),axis=1)
         return vector / np.array([norm,norm]).T
-    except np.AxisError:
+    except np.exceptions.AxisError:
         return vector / np.linalg.norm(vector)
     
 def angle_between(v1 : np.ndarray, v2 : np.ndarray|list[np.ndarray]) -> float|np.ndarray:
