@@ -7,17 +7,17 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-numpy = "^2.0.0"
-pandas = "^2.2.2"
+numpy = "^2.0"
+pandas = "^2.0"
 matplotlib = "^3.9.0"
 scipy = "^1.14.0"
 pillow = "^10.3.0"
 scikit-image = "*"
 pims = "^0.7"
-opencv-python = "^4.10.0.84"
-ruamel-yaml = "^0.18.6"
-tifffile = "^2024.6.18"
-tol-colors = "^2.1.0"
+opencv-python = "^4.0"
+ruamel-yaml = "^0.18"
+tifffile = "*"
+tol-colors = "^2.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
