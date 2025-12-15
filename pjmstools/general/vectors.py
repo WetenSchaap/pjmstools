@@ -49,15 +49,15 @@ def transform_coordinate_system(
     O : np.ndarray
         vector describing the origin of the u,v-coordinate system in xy
     P : np.ndarray
-        (x,y)-coordinates of point P in the regular coordinate system.
+        (x,y)-coordinates of point P in the regular coordinate system. Can also be an array of points.
 
     Returns
     -------
     np.ndarray
-        (u,v)-coordinates of point P
+        (u,v)-coordinates of point P. If P is an array, an array of (u,v)-coordinates is also returned.
     """
     P_shifted = P - O
     v_vec = np.array([u_vec[1], -u_vec[0]])  # perpindicular "y-axis"
     u = np.dot(P_shifted, u_vec)
     v = np.dot(P_shifted, v_vec)
-    return np.array([v, u])
+    return np.array([u, v]).T
