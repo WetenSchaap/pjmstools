@@ -1,16 +1,19 @@
 import itertools
+from typing import Any
+from collections.abc import Iterable
+import numpy.typing as npt
 import numpy as np
 import collections
 from .general import is_iter
 
-def flatten(nested_list : list[list]) -> list:
+def flatten(nested_list : list[list[Any]]) -> list[Any]:
     """
     Flatten a list of lists. 
     See [this stackoverflow topic](https://stackoverflow.com/questions/952914/how-do-i-make-a-flat-list-out-of-a-list-of-lists).
     """
     return list(itertools.chain(*nested_list))
 
-def nested_to_listoflist( l : list[list[list]], remove_duplicates=False) -> list[list]:
+def nested_to_listoflist( l : list[list[list[Any]]], remove_duplicates:bool=False) -> list[list[Any]]:
     '''
     Go from a nested list to a list of lists
     https://stackoverflow.com/questions/57217633/convert-an-irregular-list-with-multiple-levels-of-nested-lists-to-a-list-of-list'
@@ -26,16 +29,16 @@ def nested_to_listoflist( l : list[list[list]], remove_duplicates=False) -> list
         l = _merge_identical_listoflist(l)
     return l
 
-def merge_identical_items(l : list) -> list:
+def merge_identical_items(l : list[Any]) -> list[Any]:
     '''shrink a list if some of the elements are identical. Set is normally better, but this will work for non-hashables (I think). But normally use a set!'''
     counter = collections.Counter(l)
     return list(counter.keys())
 
-def is_listoflists(l : list[list]|list[tuple]|tuple[tuple,...]|tuple[list,...]) -> bool:
+def is_listoflists(l : list[list[Any]]|list[tuple[Any]]|tuple[tuple[Any],...]|tuple[list[Any],...]) -> bool:
     '''
     Checks wheter l is a list of lists or not. Will also accept list of tuples and stuff
     '''
-    if not is_iter(l) and not np.array:
+    if not is_iter(l) and not np.ndarray:
         return False
     if len(l) == 0:
         return False
@@ -44,14 +47,14 @@ def is_listoflists(l : list[list]|list[tuple]|tuple[tuple,...]|tuple[list,...]) 
     else:
         return False
 
-def closest_in_list(l : list, item) -> int:
+def closest_in_list(l : list[float|int], item: float|int) -> int:
     """
     Returns the index of the closest item in a list to the given item.
     If there are multiple items equally close, returns the first one.
     """
     return min(range(len(l)), key=lambda i: abs(l[i] - item))
 
-def _merge_identical_listoflist(l : list, upwards=False) -> list:
+def _merge_identical_listoflist(l : list[Any], upwards:bool=False) -> list[Any]:
     """Helper for nested_to_listoflist, probably not usefull alone"""
     l.sort()
     l = list(l for l,_ in itertools.groupby(l))
@@ -59,7 +62,10 @@ def _merge_identical_listoflist(l : list, upwards=False) -> list:
         l = l[0]
     return l
 
-def grouper(iterable, n: int, fillvalue=None) -> itertools.zip_longest:
+
+def grouper(
+    iterable: Iterable[Any], n: int, fillvalue: Any = None
+) -> itertools.zip_longest:
     """
     Split data in iterable into fixed-length chunks or blocks. For instance, grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx". Note that the output is an iter thing, so call list before usig in most cases.
 

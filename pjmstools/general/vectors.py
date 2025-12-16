@@ -40,14 +40,14 @@ def transform_coordinate_system(
     P: npt.NDArray[np.float64],
 ) -> npt.NDArray[np.float64]:
     """
-    Convert xy coordinates of point P to uv coordinates. Note that the v-axis positive direction is shifted *clock-wise* compared to the u-axis by defintion .
+    Convert (x,y)-coordinates of point P to a new coordinate system with (u,v)-coordinates. Note that the v-axis positive direction is shifted *clock-wise* compared to the u-axis by defintion .
 
     Parameters
     ----------
     u_vec : np.ndarray
-        unit vector describing the 'x-axis' of the uv coordinate system
+        unit vector describing the 'x-axis' of the (u,v)-coordinate system
     O : np.ndarray
-        vector describing the origin of the u,v-coordinate system in xy
+        vector describing the origin of the (u,v)-coordinate system in (x,y)
     P : np.ndarray
         (x,y)-coordinates of point P in the regular coordinate system. Can also be an array of points.
 
@@ -58,7 +58,7 @@ def transform_coordinate_system(
     """
     P_shifted = P - O
     v_vec = np.array([u_vec[1], -u_vec[0]])  # perpindicular "y-axis"
-    u = np.dot(P_shifted, u_vec)
+    u = np.dot(P_shifted, u_vec)autocorr
     v = np.dot(P_shifted, v_vec)
     return np.array([u, v]).T
 

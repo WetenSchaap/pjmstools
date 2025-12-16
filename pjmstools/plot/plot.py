@@ -29,7 +29,7 @@ from matplotlib.axes._axes import Axes
 #% FUNCTIONS
 ############################
 
-def set_defaults(preset = 'paper') -> None:
+def set_defaults(preset:str = 'paper') -> None:
     """
     Set matplotlib defaults that I always use.
     
@@ -48,7 +48,7 @@ def set_defaults(preset = 'paper') -> None:
     # mpl.rcParams['savefig.bbox'] = "tight"
     # mpl.rcParams['savefig.pad_inches'] = 0.1
 
-def set_fonts(preset='paper',small:float=7, medium:float=9, big:float=11) -> None:
+def set_fonts(preset:str='paper',small:float=7, medium:float=9, big:float=11) -> None:
     """Set font-related settings. Use preset defaults (see set_defaults) or set things individually as required."""
     if preset == 'manual':
         pass
@@ -74,7 +74,7 @@ def set_fonts(preset='paper',small:float=7, medium:float=9, big:float=11) -> Non
     plt.rc('legend', fontsize=medium)   # legend fontsize
     plt.rc('figure', titlesize=big)     # fontsize of the figure title
 
-def set_line_properties(preset='paper', linewidth = 1):
+def set_line_properties(preset:str='paper', linewidth:float = 1.0) -> None:
     """
     Set properties of lines in the plot - meaning the axis frame, ticks, etc.
 
@@ -97,7 +97,7 @@ def set_line_properties(preset='paper', linewidth = 1):
     mpl.rcParams['xtick.major.width'] = linewidth
     mpl.rcParams['ytick.major.width'] = linewidth
 
-def set_marker_properties(preset='paper', **kwargs):
+def set_marker_properties(preset:str='paper', **kwargs) -> None:
     """
     Set properties of the plotted objects - lines, markers, etc.
 
@@ -176,13 +176,13 @@ def panel(size:tuple[float,float]) -> tuple[Figure, Axes]:
     The inner workings of this are a bit magic to me, but it works, so don't ask too many questions.
     """
     fig = plt.figure(layout='compressed')          # 1. start with “rubber” canvas
-    ax = fig.add_axes([0, 0, 1, 1])                # 2. Axes fills the *initial* figure
+    ax = fig.add_axes( (0, 0, 1, 1) )                # 2. Axes fills the *initial* figure
     # 3. fix the *axes* box to the required physical size
-    ax.set_position([0, 0, size[0]/fig.get_figwidth(),size[1]/fig.get_figheight()])
+    ax.set_position([0, 0, size[0]/fig.get_figwidth(),size[1]/fig.get_figheight()])  # pyright: ignore[reportArgumentType]
     fig.set_size_inches(*fig.get_size_inches())    # 4. shrink-wrap the canvas
     return fig,ax
 
-def squarify(fig):
+def squarify(fig:Figure) -> tuple[float, float]:
     """
     Make any matplotlib figure square.
     Just do all the setupe and end with:
