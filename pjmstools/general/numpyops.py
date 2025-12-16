@@ -7,6 +7,7 @@ import scipy
 import scipy.stats
 from operator import index
 from collections import namedtuple
+import numpy.typing as npt
 
 def binned_statistic_dd(sample, values, statistic='mean',
                         bins=10, range=None, expand_binnumbers=False,
@@ -323,4 +324,3 @@ def binned_statistic_dd(sample, values, statistic='mean',
     result = result.reshape(input_shape[:-1] + list(nbin-2))
 
     return np.BinnedStatisticddResult(result, edges, binnumbers)
-

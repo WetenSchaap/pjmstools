@@ -1,7 +1,10 @@
 import numpy as np
 import pandas as pd
+from typing import Any, Hashable
+from collections.abc import Iterable
+import numpy.typing as npt
 
-def closest_key_in_a_dict(target: float, my_dict: dict) -> tuple[float,any]:
+def closest_key_in_a_dict(target: float, my_dict: dict[float,Any]) -> tuple[float,Any]:
     """
     Find the key in a dict closest in numerical value to the target
 
@@ -23,7 +26,8 @@ def closest_key_in_a_dict(target: float, my_dict: dict) -> tuple[float,any]:
     closest_value = my_dict[closest_key]
     return closest_key, closest_value
 
-def inverse_dict_lists(to_invert : dict) -> dict[list]:
+
+def inverse_dict_lists(to_invert: dict[Any, Hashable]) -> dict[list[Hashable],Any]:
     """
     Generate the inverse dict of the given dict. The values become keys, meaning they *must* be hashable and unique. The keys in the original dict are added to a list of their corresponding values. So there is *always* a list of values, even if there is only 1. Has all kinds of further weird limitations, so *always* test this on your particular usecase.
 
@@ -39,19 +43,19 @@ def inverse_dict_lists(to_invert : dict) -> dict[list]:
     for k,v in to_invert.items():
         for x in v:
             inverse.setdefault(x, []).append(k)
-
     return inverse
 
 
-def binedges_to_bincenters(bins: list[float] | np.ndarray | tuple[float]) -> np.ndarray:
+def binedges_to_bincenters(bins: Iterable[Any]) -> npt.ArrayLike:
     """
     Converts edges of bins of histogram to centers. Is a secret alias for running_average. Just throw in the binedges as you get them from np.histogram() or others, and you get the centers back.
     """
     return running_average(bins,2)
 
+
 def running_average(
-    x: list[float] | np.ndarray | tuple[float], N: int, remove_nans: bool = True
-) -> np.ndarray:
+    x: list[float] | npt.ArrayLike | tuple[float], N: int, remove_nans: bool = True
+) -> npt.ArrayLike:
     """
     Calculates running average (or rolling mean) of data x, with meansize N.
     Uses pandas Window algo's (see https://pandas.pydata.org/docs/reference/window.html).
@@ -79,9 +83,10 @@ def running_average(
         rol = rol[~np.isnan(rol)]
     return rol
 
+
 def running_std(
-    x: list[float] | np.ndarray | tuple[float], N: int, remove_nans: bool = True
-) -> np.ndarray:
+    x: list[float] | npt.ArrayLike | tuple[float], N: int, remove_nans: bool = True
+) -> npt.ArrayLike:
     """
     Calculates running standard deviation (or rolling std) of data x, over window N.
     Uses pandas Window algo's (see https://pandas.pydata.org/docs/reference/window.html).
@@ -109,13 +114,39 @@ def running_std(
         rol = rol[~np.isnan(rol)]
     return rol
 
-def is_iter(it) -> bool:
+
+def is_iter(it: Any) -> bool:
     '''Check if input is an iterable'''
     try:
         _ = iter(it)
         return True
     except TypeError:
         return False
+
+
+def auto_correlate(data:Iterable[float]) -> list[float]:
+    """
+    Perform auto-correlation on given data. Returns list with  with index equal to lag time, e.g, the number at index 4 is correlation with lag_time 4.
+
+    Based on [pandas implementation](https://pandas.pydata.org/docs/reference/api/pandas.Series.autocorr.html),
+    check there for advanced custom usage.
+
+    Parameters
+    ----------
+    data : Iterable[float]
+        Input data.
+
+    Returns
+    -------
+    Iterable[float]
+        Auto-correlated data, with index equal to lag time.
+    """
+    d = pd.Series(data)
+    cor = list()
+    for lagtime in range(len(data)-1):
+        cor.append(d.autocorr(lag=lagtime))
+    return cor
+
 
 if __name__ == "__main__":
     dict = {
