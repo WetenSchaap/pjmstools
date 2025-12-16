@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 def closest_key_in_a_dict(target: float, my_dict: dict) -> tuple[float,any]:
     """
@@ -41,16 +42,20 @@ def inverse_dict_lists(to_invert : dict) -> dict[list]:
 
     return inverse
 
-def binedges_to_bincenters(bins : list|np.ndarray|tuple) -> np.ndarray:
+
+def binedges_to_bincenters(bins: list[float] | np.ndarray | tuple[float]) -> np.ndarray:
     """
     Converts edges of bins of histogram to centers. Is a secret alias for running_average. Just throw in the binedges as you get them from np.histogram() or others, and you get the centers back.
     """
     return running_average(bins,2)
 
-def running_average(x : list|np.ndarray|tuple, N : int) -> np.ndarray:
+def running_average(
+    x: list[float] | np.ndarray | tuple[float], N: int, remove_nans: bool = True
+) -> np.ndarray:
     """
     Calculates running average (or rolling mean) of data x, with meansize N.
-    See also: https://stackoverflow.com/questions/13728392/moving-average-or-running-mean
+    Uses pandas Window algo's (see https://pandas.pydata.org/docs/reference/window.html).
+    More complex running statistics can be found there.
     
     Parameters
     ----------
@@ -58,13 +63,51 @@ def running_average(x : list|np.ndarray|tuple, N : int) -> np.ndarray:
         Data
     N : int
         Number of datapoints to average over
+    remove_nans : bool, optional
+        Whether to remove NaNs in running average, defaults to True
 
     Returns
     -------
     np.array
-        Averaged data. Will miss the first N/2 datapoints.
+        Averaged data. Will miss the first N/2 datapoints if remove_nans is true, otherwise they will be NaNs.
     """
-    return np.convolve(x, np.ones(N)/N, mode='valid')
+    # return np.convolve(x, np.ones(N)/N, mode='valid')
+    a = pd.DataFrame({'data':x})
+    rolmean = a.rolling(N).mean()
+    rol = rolmean.to_numpy()[:,0]
+    if remove_nans:
+        rol = rol[~np.isnan(rol)]
+    return rol
+
+def running_std(
+    x: list[float] | np.ndarray | tuple[float], N: int, remove_nans: bool = True
+) -> np.ndarray:
+    """
+    Calculates running standard deviation (or rolling std) of data x, over window N.
+    Uses pandas Window algo's (see https://pandas.pydata.org/docs/reference/window.html).
+    More complex running statistics can be found there.
+
+    Parameters
+    ----------
+    x : list-like
+        Data
+    N : int
+        Number of datapoints to take std over
+    remove_nans : bool, optional
+        Whether to remove NaNs in running average, defaults to True
+
+    Returns
+    -------
+    np.array
+        Std'd data. Will miss the first N/2 datapoints if remove_nans is true, otherwise they will be NaNs.
+    """
+    # return np.convolve(x, np.ones(N)/N, mode='valid')
+    a = pd.DataFrame({"data": x})
+    rolmean = a.rolling(N).std()
+    rol = rolmean.to_numpy()[:, 0]
+    if remove_nans:
+        rol = rol[~np.isnan(rol)]
+    return rol
 
 def is_iter(it) -> bool:
     '''Check if input is an iterable'''
@@ -73,7 +116,7 @@ def is_iter(it) -> bool:
         return True
     except TypeError:
         return False
-    
+
 if __name__ == "__main__":
     dict = {
         1: [1],
