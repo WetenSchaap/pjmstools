@@ -66,6 +66,7 @@ def _merge_identical_listoflist(l : list[Any], upwards:bool=False) -> list[Any]:
 def grouper(
     iterable: Iterable[Any], n: int, fillvalue: Any = None
 ) -> itertools.zip_longest:
+
     """
     Split data in iterable into fixed-length chunks or blocks. For instance, grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx". Note that the output is an iter thing, so call list before usig in most cases.
 
