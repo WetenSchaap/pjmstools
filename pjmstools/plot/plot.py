@@ -17,8 +17,9 @@ Most important are:
 
     * I would advise using tol-colors package to manage your colors.
 """
-#%%
+# %%
 import warnings
+import numpy as np
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -26,7 +27,7 @@ from matplotlib.figure import Figure
 from matplotlib.axes._axes import Axes
 
 ############################
-#% FUNCTIONS
+# % FUNCTIONS
 ############################
 
 def set_defaults(preset:str = 'paper') -> None:
@@ -125,7 +126,7 @@ def set_marker_properties(preset:str='paper', **kwargs) -> None:
     plt.rc('lines', linewidth=lw)
     plt.rc('lines', markersize=markersize)
     plt.rc('lines', markeredgewidth=markeredgewidth)
-    
+
 def default_figsize(preset:str='paper', npanels:float=3, aspect_ratio:float = 1) -> tuple[float,float]:
     """
     Returns the figure size this module is intended to work for. Note that this is the PLOTTING AREA, NOT THE CANVAS SIZE. So use with panel, not directly in a matplotlib plot!
@@ -157,28 +158,40 @@ def default_figsize(preset:str='paper', npanels:float=3, aspect_ratio:float = 1)
     panelheight = aspect_ratio * panelwidth
     return (panelheight / 25.4,panelwidth / 25.4) # conver to inches!
 
-def panel(size:tuple[float,float]) -> tuple[Figure, Axes]:
+def panel(size_inch:None|tuple[float,float]=None, size_mm:None|tuple[float,float]=None) -> tuple[Figure, Axes]:
     """
-    Create a Figure panel with a plotting area of the given size. The rest of the canvas will be scaled to fit figure labels etc.
+    Create a Figure panel with a plotting area of the given size. The rest of the canvas will be scaled to fit figure labels etc. You can give the size in mm or inches.
 
     Parameters
     ----------
-    size : tuple[float,float]
+    size_inch : tuple[float,float]
+        Size of the plotting area in INCHES (yes really)
+    size_mm : tuple[float,float]
         Size of the plotting area in INCHES (yes really)
 
     Returns
     -------
     tuple[Figure, Axes]
         Figure and Axes objects normally returned by e.g. plt.subplots()
-        
+
     Notes
     -----
     The inner workings of this are a bit magic to me, but it works, so don't ask too many questions.
     """
+    if size_inch and not size_mm:
+        size = size_inch
+    elif size_mm and not size_inch:
+        size = np.array(size_mm) / 25.4
+    else:
+        raise ValueError(
+            "Supply a size in mm (w size_mm) or in inch (w size_inch), but never both"
+        )
     fig = plt.figure(layout='compressed')          # 1. start with “rubber” canvas
-    ax = fig.add_axes( (0, 0, 1, 1) )                # 2. Axes fills the *initial* figure
-    # 3. fix the *axes* box to the required physical size
-    ax.set_position([0, 0, size[0]/fig.get_figwidth(),size[1]/fig.get_figheight()])  # pyright: ignore[reportArgumentType]
+    ax = fig.add_axes( (0, 0, 1, 1) )              # 2. Axes fills the *initial* figure
+    # 3. fix the axes box to the required physical size
+    ax.set_position(
+        [0, 0, size[0] / fig.get_figwidth(), size[1] / fig.get_figheight()]
+    )
     fig.set_size_inches(*fig.get_size_inches())    # 4. shrink-wrap the canvas
     return fig,ax
 
@@ -207,7 +220,7 @@ def squarify(fig:Figure) -> tuple[float, float]:
     return (fig.get_figheight(), fig.get_figwidth())
 
 ############################
-#% USEFULL SHORTCUTS
+# % USEFULL SHORTCUTS
 ############################
 
 # EXTRA LINESTYLES
@@ -237,13 +250,13 @@ linestyle_dict = {
 
 
 ############################
-#% USEFULL TIPS
+# % USEFULL TIPS
 ############################
 ## to get a specific color on a certain value in a color scale:
 # cmap = mpl.cm.get_cmap('viridis') # or cmap = tc.colormaps['iridescent']
 # rgba = cmap(0.5)
 # print(rgba) # (0.127568, 0.566949, 0.550556, 1.0)
-## Optionally, normalize: 
+## Optionally, normalize:
 # norm = mpl.colors.Normalize(vmin=10.0, vmax=20.0)
 # rgba = cmap(norm(15)) # norm results in 0.5
 # print(rgba) # (0.127568, 0.566949, 0.550556, 1.0)
@@ -266,7 +279,7 @@ if __name__ == "__main__":
         
         set_defaults(preset)
         size = default_figsize(preset)
-        fig,ax = panel(size=size)
+        fig,ax = panel(size_inch=size)
         for i in range(4):
             y.append( np.sin(x*(i+1)*0.1) )
             ax.plot(
@@ -285,7 +298,7 @@ if __name__ == "__main__":
         x = np.linspace(0,10*np.pi,15)
         y = list()
 
-        fig,ax = panel(size=size)
+        fig,ax = panel(size_inch=size)
 
         for i in range(datasets):
             y.append( np.sin(x*(i+1)*0.1) )

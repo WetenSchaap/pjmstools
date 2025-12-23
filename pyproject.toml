@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pjmstools"
-version = "0.1.0"
+version = "0.1.2"
 description = ""
 authors = ["WetenSchaap <36634689+WetenSchaap@users.noreply.github.com>"]
 readme = "README.md"
