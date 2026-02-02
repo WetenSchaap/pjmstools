@@ -1,23 +1,23 @@
 [tool.poetry]
 name = "pjmstools"
-version = "0.1.2"
+version = "0.1.3"
 description = ""
 authors = ["WetenSchaap <36634689+WetenSchaap@users.noreply.github.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.11,<4"
 numpy = "^2"
-pandas = "^2"
-matplotlib = "^3.9.0"
+pandas = "^3"
+matplotlib = "^3.9"
 scipy = "^1"
 pillow = "*"
 scikit-image = "*"
-pims = "^0.7"
+pims = "*"
 opencv-python = "^4.0"
 ruamel-yaml = "^0.18"
 tifffile = "*"
-tol-colors = "^2.0.0"
+tol-colors = "^2"
 
 
 [tool.poetry.group.dev.dependencies]
