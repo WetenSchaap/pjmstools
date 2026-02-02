@@ -36,10 +36,11 @@ def set_defaults(preset:str = 'paper') -> None:
     
     The selected preset optimises sizes for a particular purpose, e.g. 'paper' for use in paper, 'presentation' for use in presentation, 'inset' for a tiny inset. That kinda thing.
     """
+    set_fontfamily()
     set_fonts(preset=preset)
     set_line_properties(preset=preset)
     set_marker_properties(preset=preset)
-    
+
     # Figure quality (in case of jpg/png/...)
     dpi = 300
     mpl.rcParams['figure.dpi'] = dpi
@@ -49,8 +50,23 @@ def set_defaults(preset:str = 'paper') -> None:
     # mpl.rcParams['savefig.bbox'] = "tight"
     # mpl.rcParams['savefig.pad_inches'] = 0.1
 
+def set_fontfamily(fontname="roboto") -> None:
+    """
+    Set font family (so the way letters look) to given font.
+
+    Yes, I know this is really easy in matplotlib, but I always forget how to do it.
+    
+    My personal default is **roboto** at the time of writing, since I read somewhere that this is easy to read on plots. Check that it is installed with 
+    
+    ``` 
+    from matplotlib import font_manager
+    sorted( font_manager.get_font_names() )
+    ```
+    """
+    plt.rcParams["font.family"] = fontname
+
 def set_fonts(preset:str='paper',small:float=7, medium:float=9, big:float=11) -> None:
-    """Set font-related settings. Use preset defaults (see set_defaults) or set things individually as required."""
+    """Set font-related settings. Use preset defaults (see set_defaults) or set things individually as required. **Does not change the font family, only the sizes**, check set_fontfamily for that."""
     if preset == 'manual':
         pass
     elif preset == 'paper':
