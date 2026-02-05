@@ -50,7 +50,7 @@ def set_defaults(preset:str = 'paper') -> None:
     # mpl.rcParams['savefig.bbox'] = "tight"
     # mpl.rcParams['savefig.pad_inches'] = 0.1
 
-def set_fontfamily(fontname="roboto") -> None:
+def set_fontfamily(fontname="Roboto") -> None:
     """
     Set font family (so the way letters look) to given font.
 
@@ -63,10 +63,23 @@ def set_fontfamily(fontname="roboto") -> None:
     sorted( font_manager.get_font_names() )
     ```
     """
-    plt.rcParams["font.family"] = fontname
+    from matplotlib import font_manager
+    fonts = sorted( font_manager.get_font_names() )
+    if fontname in fonts:
+        plt.rcParams["font.family"] = fontname
+    else:
+        print("Available Fonts in Matplotlib")
+        print("-----------------------------")
+        print("")
+        for i in range(len(fonts)):
+            print(fonts[i])
+        raise ValueError(
+            f"{fontname} is not available in matplotlib. Check for spelling (including capitalization) in list above. If font is installed but not in Matplotlib, try mplfonts package."
+        )
 
 def set_fonts(preset:str='paper',small:float=7, medium:float=9, big:float=11) -> None:
     """Set font-related settings. Use preset defaults (see set_defaults) or set things individually as required. **Does not change the font family, only the sizes**, check set_fontfamily for that."""
+    plt.rcParams["svg.fonttype"] = "none" # This makes matplotlib text actually appear as text! Very important for editing in e.g. Inkscape.
     if preset == 'manual':
         pass
     elif preset == 'paper':
