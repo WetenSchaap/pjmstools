@@ -1,29 +1,25 @@
-[tool.poetry]
+[project]
 name = "pjmstools"
-version = "0.1.5"
+version = "0.1.6"
 description = ""
 authors = ["WetenSchaap <36634689+WetenSchaap@users.noreply.github.com>"]
 readme = "README.md"
+dependencies = [
+    "numpy>=2",
+    "pandas>=3",
+    "matplotlib>=3.9",
+    "scipy>=1",
+    "pillow>12.1",
+    "scikit-image>=0.25",
+    "pims>=0.5",
+    "opencv-python>=4.0",
+    "ruamel-yaml>=0.18",
+    "tifffile>=2025",
+    "tol-colors>=2",
+    "ffmpeg-python>=0.2.0",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.11,<4"
-numpy = ">=2"
-pandas = "^3"
-matplotlib = ">=3.9"
-scipy = ">=1"
-pillow = ">12.1"
-scikit-image = ">=0.25"
-pims = ">=0.5"
-opencv-python = "^4.0"
-ruamel-yaml = ">=0.18"
-tifffile = ">=2025"
-tol-colors = "^2"
-
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.2.2"
-ipykernel = "^6.29.4"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+    "ipykernel>=7.2.0",
+]
