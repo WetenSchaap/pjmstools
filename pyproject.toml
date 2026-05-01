@@ -1,8 +1,8 @@
 [project]
 name = "pjmstools"
-version = "0.1.6"
+version = "0.1.7"
 description = ""
-authors = ["WetenSchaap <36634689+WetenSchaap@users.noreply.github.com>"]
+authors = [{name = "WetenSchaap", email = "36634689+WetenSchaap@users.noreply.github.com"}]
 readme = "README.md"
 dependencies = [
     "numpy>=2",

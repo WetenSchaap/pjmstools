@@ -156,7 +156,7 @@ def set_marker_properties(preset:str='paper', **kwargs) -> None:
     plt.rc('lines', markersize=markersize)
     plt.rc('lines', markeredgewidth=markeredgewidth)
 
-def default_figsize(preset:str='paper', npanels:float=3, aspect_ratio:float = 1) -> tuple[float,float]:
+def default_figsize(preset:str='paper', aspect_ratio=1) -> tuple[float,float]:
     """
     Returns the figure size this module is intended to work for. Note that this is the PLOTTING AREA, NOT THE CANVAS SIZE. So use with panel, not directly in a matplotlib plot!
     
@@ -164,10 +164,8 @@ def default_figsize(preset:str='paper', npanels:float=3, aspect_ratio:float = 1)
     ----------
     preset: str, optional
         One of the presets also defined in set_defaults, e.g. 'paper', 'presentation', ...
-    npanels : float, optional
-        Split the full width of the page/slide/whatever into this many individual panels (half panels also possible), by default 3.
     aspect_ratio: float, optional
-        Change this number to elongate (make number higher) or shorten (make number smaller) then normal. Default is 1 (width=height). 
+        Change this number to make plot longer (in Y-direction) (make number higher) or shorten (make number smaller) then normal. Default is 1 (width=height). 
 
     Returns
     -------
@@ -175,15 +173,15 @@ def default_figsize(preset:str='paper', npanels:float=3, aspect_ratio:float = 1)
         size of a single panel that will have the correct dimensions for all other parts of this default look to work.
     """
     if preset == 'paper':
-        total_width = 160 # typically you have a total page width available of 160 mm
+        total_width = 40 # typically you have a total page width available of 160 mm, 40 mm is the natural size or a panel.
     elif preset == 'presentation':
-        total_width = 280 # ppt slides are normally 28 x 15.75 cm (DEC 2025)
+        total_width = 200 # ppt slides are normally 28 x 15.75 cm (DEC 2025)
     elif preset == "inset":
-        # not so easy I guess, typically the width of a normal figure I guess, which is 5-ish cm.
-        total_width = 50
+        # not so easy but set a standard anyway so you have an aim at least
+        total_width = 10
     else:
         raise NotImplementedError(f"{preset} is not implemented (yet) as a preset")
-    panelwidth = total_width/npanels
+    panelwidth = total_width
     panelheight = aspect_ratio * panelwidth
     return (panelheight / 25.4,panelwidth / 25.4) # conver to inches!
 

@@ -96,6 +96,11 @@ def load_video(path:Path|str, batch_size:int=100, every_n_frames:int=1,) -> NDAr
         warnings.warn(
             "batch_size and every_n_frames are not attuned to each other; every_n_frames should fit into batch_size an integer number of times, or drift will occur between batches"
         )
+    if type(path) != Path:
+        path = Path(path)
+    if not path.exists():
+        # ffmpeg is not good at saying it can't find a file, so do it for them
+        raise FileNotFoundError(f"{path} does not exist.")
     full_array = []
     for batch in stream_video(path, batch_size=batch_size):
         full_array.extend(batch[::every_n_frames])  # 
