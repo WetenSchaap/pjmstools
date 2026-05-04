@@ -17,7 +17,6 @@ Most important are:
 
     * I would advise using tol-colors package to manage your colors.
 """
-# %%
 import warnings
 import numpy as np
 
@@ -185,6 +184,17 @@ def default_figsize(preset:str='paper', aspect_ratio=1) -> tuple[float,float]:
     panelheight = aspect_ratio * panelwidth
     return (panelheight / 25.4,panelwidth / 25.4) # conver to inches!
 
+
+def _parse_size(size_inch, size_mm):
+    """Helper to get size in inches."""
+    if size_inch and not size_mm:
+        return np.array(size_inch)
+    elif size_mm and not size_inch:
+        return np.array(size_mm) / 25.4
+    else:
+        raise ValueError("Supply size in mm or inches, never both")
+
+
 def panel(size_inch:None|tuple[float,float]=None, size_mm:None|tuple[float,float]=None) -> tuple[Figure, Axes]:
     """
     Create a Figure panel with a plotting area of the given size. The rest of the canvas will be scaled to fit figure labels etc. You can give the size in mm or inches.
@@ -205,14 +215,7 @@ def panel(size_inch:None|tuple[float,float]=None, size_mm:None|tuple[float,float
     -----
     The inner workings of this are a bit magic to me, but it works, so don't ask too many questions.
     """
-    if size_inch and not size_mm:
-        size = size_inch
-    elif size_mm and not size_inch:
-        size = np.array(size_mm) / 25.4
-    else:
-        raise ValueError(
-            "Supply a size in mm (w size_mm) or in inch (w size_inch), but never both"
-        )
+    size = _parse_size(size_inch, size_mm)
     fig = plt.figure(layout='compressed')          # 1. start with “rubber” canvas
     ax = fig.add_axes( (0, 0, 1, 1) )              # 2. Axes fills the *initial* figure
     # 3. fix the axes box to the required physical size
@@ -221,6 +224,98 @@ def panel(size_inch:None|tuple[float,float]=None, size_mm:None|tuple[float,float
     )
     fig.set_size_inches(*fig.get_size_inches())    # 4. shrink-wrap the canvas
     return fig,ax
+
+
+def panels_row(
+    n: int,
+    size_inch: None | tuple[float, float] = None,
+    size_mm: None | tuple[float, float] = None,
+    sharey: bool = True,
+) -> tuple[Figure, list[Axes]]:
+    """
+    Create a figure with n side-by-side panels of equal plotting area size, touching edge-to-edge.
+
+    Parameters
+    ----------
+    n : int
+        Number of panels to place horizontally.
+    size_inch : tuple[float,float]
+        Size of each individual plotting area in INCHES (yes really).
+    size_mm : tuple[float,float]
+        Size of each individual plotting area in MILLIMETRES (yes really).
+    sharey : bool
+        Whether to share the y-axis between all panels. Default True.
+    """
+    size = _parse_size(size_inch, size_mm)
+    panel_w, panel_h = size
+
+    # Total figure size: n panels wide, 1 panel high
+    fig_w = n * panel_w
+    fig_h = panel_h
+
+    fig = plt.figure(figsize=(fig_w, fig_h))
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1, wspace=0, hspace=0)
+
+    axes = []
+    for i in range(n):
+        rect = [i / n, 0, 1 / n, 1]  # [left, bottom, width, height] in figure fraction
+        if i == 0:
+            ax = fig.add_axes(rect)
+            ax0 = ax
+        else:
+            ax = fig.add_axes(rect, sharey=ax0 if sharey else None)
+        axes.append(ax)
+
+    return fig, axes
+
+
+def panels_col(
+    n: int,
+    size_inch: None | tuple[float, float] = None,
+    size_mm: None | tuple[float, float] = None,
+    sharex: bool = True,
+) -> tuple[Figure, list[Axes]]:
+    """
+    Create a figure with n vertically stacked panels of equal plotting area size, touching edge-to-edge.
+
+    Parameters
+    ----------
+    n : int
+        Number of panels to place vertically.
+    size_inch : tuple[float,float]
+        Size of each individual plotting area in INCHES (yes really).
+    size_mm : tuple[float,float]
+        Size of each individual plotting area in MILLIMETRES (yes really).
+    sharex : bool
+        Whether to share the x-axis between all panels. Default True.
+
+    Returns
+    -------
+    tuple[Figure, list[Axes]]
+        Figure and list of Axes objects, top to bottom.
+    """
+    size = _parse_size(size_inch, size_mm)
+    panel_w, panel_h = size
+
+    # Total figure size: 1 panel wide, n panels high
+    fig_w = panel_w
+    fig_h = n * panel_h
+
+    fig = plt.figure(figsize=(fig_w, fig_h))
+    fig.subplots_adjust(left=0, right=1, bottom=0, top=1, wspace=0, hspace=0)
+
+    axes = []
+    for i in range(n):
+        rect = [0, (n - 1 - i) / n, 1, 1 / n]  # bottom-to-top order
+        if i == 0:
+            ax = fig.add_axes(rect)
+            ax0 = ax
+        else:
+            ax = fig.add_axes(rect, sharex=ax0 if sharex else None)
+        axes.append(ax)
+
+    return fig, axes
+
 
 def squarify(fig:Figure) -> tuple[float, float]:
     """
@@ -276,20 +371,6 @@ linestyle_dict = {
 }
 
 
-############################
-# % USEFULL TIPS
-############################
-## to get a specific color on a certain value in a color scale:
-# cmap = mpl.cm.get_cmap('viridis') # or cmap = tc.colormaps['iridescent']
-# rgba = cmap(0.5)
-# print(rgba) # (0.127568, 0.566949, 0.550556, 1.0)
-## Optionally, normalize:
-# norm = mpl.colors.Normalize(vmin=10.0, vmax=20.0)
-# rgba = cmap(norm(15)) # norm results in 0.5
-# print(rgba) # (0.127568, 0.566949, 0.550556, 1.0)
-# see test below for clear example.
-
-
 if __name__ == "__main__":
     """
     Quickly test plotting so you can see what a plot will look like. Running from the commandline will result in poorly squarified plots, so don't worry about that too much.
@@ -303,7 +384,7 @@ if __name__ == "__main__":
         cset = tc.colorsets['bright']
         x = np.linspace(0,10*np.pi,100)
         y = list()
-        
+
         set_defaults(preset)
         size = default_figsize(preset)
         fig,ax = panel(size_inch=size)
@@ -317,7 +398,7 @@ if __name__ == "__main__":
             )
         plt.show()
         fig.savefig(savepath/f"{preset}.png",dpi=150,bbox_inches='tight')
-        
+
         # CONT DATA
         datasets = 10
         cset = tc.colormaps['iridescent']
@@ -337,3 +418,63 @@ if __name__ == "__main__":
                 color = rgba,
             )
         plt.show()
+
+
+    def test_panels_row(savepath):
+        """3 horizontal panels with shared y-axis."""
+        fig, axes = panels_row(
+            n=3, size_mm=(40, 40), sharey=True  # small panels to see the effect clearly
+        )
+
+        # Different x ranges, same y range — shared y should align them
+        x_ranges = [(0, 10), (5, 15), (10, 20)]
+
+        for i, ax in enumerate(axes):
+            x = np.linspace(*x_ranges[i], 100)
+            y = np.sin(x) + 0.3 * np.random.randn(100)
+            ax.plot(x, y, color=f"C{i}", linewidth=2)
+            ax.set_title(f"Panel {i+1}", fontsize=8)
+            ax.set_xlabel("x")
+
+        # Only leftmost y-label
+        axes[0].set_ylabel("shared y")
+        for ax in axes[1:]:
+            ax.tick_params(labelleft=False)
+
+        # Add vertical lines at panel boundaries to verify touching
+        for ax in axes:
+            ax.axvline(ax.get_xlim()[1], color="red", linestyle="--", alpha=0.3)
+
+        fig.suptitle("panels_row: 3× horizontal, touching, sharey=True", fontsize=10)
+        plt.savefig(savepath / "test_row.png", dpi=150)
+        plt.show()
+
+
+    def test_panels_col(savepath):
+        """4 vertical panels with shared x-axis."""
+        fig, axes = panels_col(n=4, size_mm=(60, 30), sharex=True)
+
+        # Same x range, different y ranges — shared x should align them
+        y_offsets = [0, 5, 10, 15]
+
+        for i, ax in enumerate(axes):
+            x = np.linspace(0, 10, 100)
+            y = np.exp(-x / 3) + y_offsets[i] + 0.2 * np.random.randn(100)
+            ax.plot(x, y, color=f"C{i+3}", linewidth=2)
+            ax.set_ylabel(f"ch {i+1}", fontsize=8)
+
+        # Only bottom x-label
+        axes[-1].set_xlabel("shared x")
+        for ax in axes[:-1]:
+            ax.tick_params(labelbottom=False)
+
+        # Add horizontal lines at panel boundaries to verify touching
+        for ax in axes:
+            ax.axhline(ax.get_ylim()[0], color="red", linestyle="--", alpha=0.3)
+
+        fig.suptitle("panels_col: 4× vertical, touching, sharex=True", fontsize=10)
+        plt.savefig(savepath / "test_col.png", dpi=150)
+        plt.show()
+    
+    test_panels_row(savepath)
+    test_panels_col(savepath)
