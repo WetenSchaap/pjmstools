@@ -230,6 +230,7 @@ def panels_row(
     n: int,
     size_inch: None | tuple[float, float] = None,
     size_mm: None | tuple[float, float] = None,
+    sharex: bool = False,
     sharey: bool = True,
 ) -> tuple[Figure, list[Axes]]:
     """
@@ -243,6 +244,8 @@ def panels_row(
         Size of each individual plotting area in INCHES (yes really).
     size_mm : tuple[float,float]
         Size of each individual plotting area in MILLIMETRES (yes really).
+    sharex : bool
+        Whether to share the x-axis between all panels. Default False.
     sharey : bool
         Whether to share the y-axis between all panels. Default True.
     """
@@ -263,7 +266,9 @@ def panels_row(
             ax = fig.add_axes(rect)
             ax0 = ax
         else:
-            ax = fig.add_axes(rect, sharey=ax0 if sharey else None)
+            ax = fig.add_axes(rect, sharey=ax0 if sharey else None, sharex=ax0 if sharex else None)
+            ax.tick_params(labelleft=False)
+        # if 
         axes.append(ax)
 
     return fig, axes
@@ -274,6 +279,7 @@ def panels_col(
     size_inch: None | tuple[float, float] = None,
     size_mm: None | tuple[float, float] = None,
     sharex: bool = True,
+    sharey: bool = False,
 ) -> tuple[Figure, list[Axes]]:
     """
     Create a figure with n vertically stacked panels of equal plotting area size, touching edge-to-edge.
@@ -288,6 +294,8 @@ def panels_col(
         Size of each individual plotting area in MILLIMETRES (yes really).
     sharex : bool
         Whether to share the x-axis between all panels. Default True.
+    sharey : bool
+        Whether to share the y-axis between all panels. Default False.
 
     Returns
     -------
@@ -311,7 +319,11 @@ def panels_col(
             ax = fig.add_axes(rect)
             ax0 = ax
         else:
-            ax = fig.add_axes(rect, sharex=ax0 if sharex else None)
+            ax = fig.add_axes(
+                rect, sharex=ax0 if sharex else None, sharey=ax0 if sharey else None
+            )
+        if i != n-1:
+            ax.tick_params(labelbottom=False)
         axes.append(ax)
 
     return fig, axes
@@ -419,7 +431,6 @@ if __name__ == "__main__":
             )
         plt.show()
 
-
     def test_panels_row(savepath):
         """3 horizontal panels with shared y-axis."""
         fig, axes = panels_row(
@@ -438,17 +449,10 @@ if __name__ == "__main__":
 
         # Only leftmost y-label
         axes[0].set_ylabel("shared y")
-        for ax in axes[1:]:
-            ax.tick_params(labelleft=False)
 
-        # Add vertical lines at panel boundaries to verify touching
-        for ax in axes:
-            ax.axvline(ax.get_xlim()[1], color="red", linestyle="--", alpha=0.3)
-
-        fig.suptitle("panels_row: 3× horizontal, touching, sharey=True", fontsize=10)
-        plt.savefig(savepath / "test_row.png", dpi=150)
+        fig.suptitle("panels_row: 3x horizontal, touching, sharey=True", fontsize=10)
+        plt.savefig(savepath / "test_row.png", dpi=150, bbox_inches="tight")
         plt.show()
-
 
     def test_panels_col(savepath):
         """4 vertical panels with shared x-axis."""
@@ -460,21 +464,19 @@ if __name__ == "__main__":
         for i, ax in enumerate(axes):
             x = np.linspace(0, 10, 100)
             y = np.exp(-x / 3) + y_offsets[i] + 0.2 * np.random.randn(100)
-            ax.plot(x, y, color=f"C{i+3}", linewidth=2)
-            ax.set_ylabel(f"ch {i+1}", fontsize=8)
+            ax.plot(x, y, color=f"C{i+3}")
+            ax.set_ylabel(f"ch {i+1}")
 
         # Only bottom x-label
         axes[-1].set_xlabel("shared x")
-        for ax in axes[:-1]:
-            ax.tick_params(labelbottom=False)
+        # axes[-1].set_xticks([0,2.5,5.0,7.5,1.00])
+        # for ax in axes[:-1]:
+        #     ax.tick_params(labelbottom=False)
 
-        # Add horizontal lines at panel boundaries to verify touching
-        for ax in axes:
-            ax.axhline(ax.get_ylim()[0], color="red", linestyle="--", alpha=0.3)
 
-        fig.suptitle("panels_col: 4× vertical, touching, sharex=True", fontsize=10)
-        plt.savefig(savepath / "test_col.png", dpi=150)
+        fig.suptitle("panels_col: 4x vertical, touching, sharex=True", fontsize=10)
+        plt.savefig(savepath / "test_col.png", dpi=150, bbox_inches="tight")
         plt.show()
-    
+    set_defaults('paper')
     test_panels_row(savepath)
     test_panels_col(savepath)

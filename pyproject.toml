@@ -1,6 +1,6 @@
 [project]
 name = "pjmstools"
-version = "0.1.8"
+version = "0.1.9"
 description = ""
 authors = [{name = "WetenSchaap", email = "36634689+WetenSchaap@users.noreply.github.com"}]
 readme = "README.md"
